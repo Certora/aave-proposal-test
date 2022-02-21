@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.12;
 
 library LibPropConstants {
     
@@ -7,7 +9,7 @@ library LibPropConstants {
     address internal constant ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     address internal constant ECOSYSTEM_RESERVE_CONTROLLER = 0x1E506cbb6721B83B1549fa1558332381Ffa61A93;
     address internal constant SHORT_EXECUTOR = 0xEE56e2B3D491590B5b31738cC34d5232F378a8D5;
-    address internal constant AAVE_TOKEN_PROXY = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9; 
+    address internal constant AAVE_TOKEN = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
     address internal constant USDC_TOKEN = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address internal constant SABLIER = 0xCD18eAa163733Da39c232722cBC4E8940b1D8888;
     address internal constant CERTORA_BENEFICIARY = address(0x0); // xxx
