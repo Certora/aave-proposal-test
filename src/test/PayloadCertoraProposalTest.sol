@@ -10,6 +10,13 @@ import {PayloadCertoraProposal} from "../PayloadCertoraProposal.sol";
 contract PayloadCertoraProposalTest is BaseTest {
     function setUp() public {}
 
+    /// @dev Check conversion of units
+    function testConversion() public {
+        PayloadCertoraProposal testContract = new PayloadCertoraProposal();
+        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH), 4430);
+        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH), 126);
+    }
+
     /// @dev First deploys a fresh payload, then tests everything using it
     function testProposalPrePayload() public {
         address payload = address(new PayloadCertoraProposal());
@@ -17,10 +24,10 @@ contract PayloadCertoraProposalTest is BaseTest {
     }
 
     /// @dev Uses an already deployed payload on the target network
-    function testProposalPostPayload() public {
+    /*function testProposalPostPayload() public {
         address payload = address(0x0); // xxx
         _testProposal(payload);
-    }
+    }*/
 
     IAaveGov GOV = IAaveGov(LibPropConstants.AAVE_GOVERNANCE);
 

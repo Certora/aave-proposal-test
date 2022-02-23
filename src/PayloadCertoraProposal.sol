@@ -35,7 +35,7 @@ contract PayloadCertoraProposal {
 
 
     // formally verify me please :-)
-    function convertUSDCAmountToAAVE(uint256 usdcAmount) internal view returns (uint256) {
+    function convertUSDCAmountToAAVE(uint256 usdcAmount) public view returns (uint256) {
         uint8 usdcDecimals = IERC20(LibPropConstants.USDC_TOKEN).decimals();
         uint8 aaveDecimals = IERC20(LibPropConstants.AAVE_TOKEN).decimals();
 
