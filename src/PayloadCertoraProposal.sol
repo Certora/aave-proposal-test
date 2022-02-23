@@ -42,8 +42,8 @@ contract PayloadCertoraProposal {
         /**
             aave_amount = (usdcAmount / price) * aaveDecimals / usdcDecimals
          */
-        uint256 aaveAmount = usdcAmount * 10**LibPropConstants.AAVE_PRICE_DECIMALS * aaveDecimals 
-                                / (LibPropConstants.AAVE_PRICE_USDC_6_DECIMALS * usdcDecimals);
+        uint256 aaveAmount = usdcAmount * 10**LibPropConstants.AAVE_PRICE_DECIMALS * 10**aaveDecimals 
+                                / (LibPropConstants.AAVE_PRICE_USDC_6_DECIMALS * 10**usdcDecimals);
         return aaveAmount;
     }
 

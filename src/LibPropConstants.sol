@@ -18,10 +18,10 @@ library LibPropConstants {
     address internal constant AAVE_COLLECTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c; // proxy, execute 61 to see upgraded
 
     // Amounts
-    uint256 internal constant USDC_V3 = 420_000;
-    uint256 internal constant USDC_VEST = 1_000_000;
-    uint256 internal constant AAVE_VEST_USDC_WORTH = 700_000;
-    uint256 internal constant AAVE_FUND_USDC_WORTH = 200_000;
+    uint256 internal constant USDC_V3 = 420_000 * 1e6;
+    uint256 internal constant USDC_VEST = 1_000_000 * 1e6;
+    uint256 internal constant AAVE_VEST_USDC_WORTH = 700_000 * 1e6;
+    uint256 internal constant AAVE_FUND_USDC_WORTH = 200_000 * 1e6;
 
     uint256 internal constant AAVE_PRICE_USDC_6_DECIMALS = 158_226364; // $158.2263636 xxx
     uint8 internal constant AAVE_PRICE_DECIMALS = 6;

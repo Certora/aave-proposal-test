@@ -13,8 +13,8 @@ contract PayloadCertoraProposalTest is BaseTest {
     /// @dev Check conversion of units
     function testConversion() public {
         PayloadCertoraProposal testContract = new PayloadCertoraProposal();
-        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH), 4430);
-        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH), 126);
+        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH)/1e18, 4424);
+        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH)/1e18, 1264);
     }
 
     /// @dev First deploys a fresh payload, then tests everything using it
