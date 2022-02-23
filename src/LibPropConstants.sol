@@ -15,7 +15,8 @@ library LibPropConstants {
     address internal constant CERTORA_BENEFICIARY = 0x0F11640BF66e2D9352d9c41434A5C6E597c5e4c8;
     address internal constant CERTORA_AAVE_MULTISIG = address(0x0); // xxx
     // new impl
-    address internal constant AAVE_COLLECTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c; // proxy, execute 61 to see upgraded
+    address internal constant AAVE_COLLECTOR = // 0xa335E2443b59d11337E9005c9AF5bC31F8000714; // real new implementation
+     0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c; // proxy, execute 61 to see upgraded
 
     // Amounts
     uint256 internal constant USDC_V3 = 420_000 * 1e6;

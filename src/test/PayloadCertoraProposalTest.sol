@@ -17,8 +17,25 @@ contract PayloadCertoraProposalTest is BaseTest {
         assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH)/1e18, 1264);
     }
 
+    function pass61() internal {
+        uint proposalId = 61;
+        vm.deal(LibPropConstants.ECOSYSTEM_RESERVE, 1 ether);
+        vm.startPrank(LibPropConstants.ECOSYSTEM_RESERVE);
+        vm.roll(block.number + 1);
+        GOV.submitVote(proposalId, true);
+        uint256 endBlock = GOV.getProposalById(proposalId).endBlock;
+        vm.roll(endBlock + 1);
+        GOV.queue(proposalId);
+        uint256 executionTime = GOV.getProposalById(proposalId).executionTime;
+        vm.warp(executionTime + 1);
+        GOV.execute(proposalId);
+        vm.stopPrank();
+    }
+
     /// @dev First deploys a fresh payload, then tests everything using it
     function testProposalPrePayload() public {
+        // imagine proposal 61 has passed
+        pass61();
         address payload = address(new PayloadCertoraProposal());
         _testProposal(payload);
     }

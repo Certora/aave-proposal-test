@@ -47,6 +47,8 @@ contract PayloadCertoraProposal {
         return aaveAmount;
     }
 
+
+    // LO: Consider using address(this) instead of SHORT_EXECUTOR
     function execute() external {
         uint256 totalAaveAmount = convertUSDCAmountToAAVE(
                 LibPropConstants.AAVE_VEST_USDC_WORTH + LibPropConstants.AAVE_FUND_USDC_WORTH
@@ -67,24 +69,28 @@ contract PayloadCertoraProposal {
         /**
             2. Approve $700,000 worth of AAVE tokens to Sablier.
          */
+        require(IERC20(LibPropConstants.AAVE_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.AAVE_TOKEN).approve(LibPropConstants.SABLIER, vestAaveAmount);
 
         /**
             3. Create a Sablier stream with Certora as the beneficiary, to stream the $700,000 worth of Aave over 6 months.
          */
         uint currentTime = block.timestamp;
-        ISablier(LibPropConstants.SABLIER).createStream(
+        uint duration = 6 * 30 days;
+        uint actualAmount = (vestAaveAmount / duration) * duration; // rounding
+        uint streamIdAaveVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY,
-            vestAaveAmount,
+            actualAmount,
             LibPropConstants.AAVE_TOKEN,
             currentTime,
-            currentTime + 6*30 days
+            currentTime + duration
         );
+        // TODO: Check streamIdAaveVest
 
         /**
             4. Transfer $200,000 worth of AAVE to a multisig co-controlled by Aave and Certora teams.
          */
-        IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount);
+        //IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount); // xxx
 
         /**
             5. Transfer USDC 1,420,000 from the Aave Collector to the ShortExecutor (exact mechanism TBD).
@@ -103,18 +109,22 @@ contract PayloadCertoraProposal {
         /**
             7. Approve USDC 1,000,000 to Sablier.
          */
-         IERC20(LibPropConstants.USDC_TOKEN).approve(LibPropConstants.SABLIER, LibPropConstants.USDC_VEST);
+        require(IERC20(LibPropConstants.USDC_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
+        IERC20(LibPropConstants.USDC_TOKEN).approve(LibPropConstants.SABLIER, LibPropConstants.USDC_VEST);
         
         /**
             8. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
          */
-        ISablier(LibPropConstants.SABLIER).createStream(
+        //console.log
+        actualAmount = (LibPropConstants.USDC_VEST / duration) * duration; // rounding
+        /*uint streamIdUSDCVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY, 
-            LibPropConstants.USDC_VEST,
+            actualAmount,
             LibPropConstants.USDC_TOKEN,
             currentTime, 
-            currentTime + 6*30 days
-        );
+            currentTime + duration
+        );*/
+        // TODO: Check streamIdUSDCVest
 
     }
 }
