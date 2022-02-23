@@ -22,6 +22,8 @@ contract PayloadCertoraProposalTest is BaseTest {
         _testProposal(payload);
     }
 
+    IAaveGov GOV = IAaveGov(LibPropConstants.AAVE_GOVERNANCE);
+
     function _testProposal(address payload) internal {
         address[] memory targets = new address[](1);
         targets[0] = payload;
@@ -52,9 +54,9 @@ contract PayloadCertoraProposalTest is BaseTest {
         uint256 recipientWethBefore = IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
             LibPropConstants.CERTORA_BENEFICIARY
         );
-/*
-        vm.deal(AAVE_TREASURY, 1 ether);
-        vm.startPrank(AAVE_TREASURY);
+
+        vm.deal(LibPropConstants.ECOSYSTEM_RESERVE, 1 ether);
+        vm.startPrank(LibPropConstants.ECOSYSTEM_RESERVE);
         vm.roll(block.number + 1);
         GOV.submitVote(proposalId, true);
         uint256 endBlock = GOV.getProposalById(proposalId).endBlock;
@@ -64,7 +66,7 @@ contract PayloadCertoraProposalTest is BaseTest {
         vm.warp(executionTime + 1);
         GOV.execute(proposalId);
         vm.stopPrank();
-
+/*
         _validatePhaseIFunds(recipientUsdcBefore, recipientWethBefore);
         address newControllerOfCollector = _validateNewCollector();
         _validateNewControllerOfCollector(ICollector(newControllerOfCollector));*/
@@ -76,7 +78,7 @@ contract PayloadCertoraProposalTest is BaseTest {
     {
         vm.deal(LibPropConstants.ECOSYSTEM_RESERVE, 1 ether);
         vm.startPrank(LibPropConstants.ECOSYSTEM_RESERVE);
-        uint256 proposalId = IAaveGov(LibPropConstants.AAVE_GOVERNANCE).create(
+        uint256 proposalId = GOV.create(
             params.executor,
             params.targets,
             params.values,

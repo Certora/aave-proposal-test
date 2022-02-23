@@ -2,8 +2,7 @@
 pragma solidity 0.8.12;
 
 import {LibPropConstants} from "./LibPropConstants.sol";
-
-
+import {IERC20} from "./IERC20.sol";
 
 interface IControllerAaveEcosystemReserve {
     function transfer(
