@@ -130,15 +130,14 @@ contract PayloadCertoraProposal {
         /**
             8. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
          */
-        //console.log
         actualAmount = (LibPropConstants.USDC_VEST / duration) * duration; // rounding
-        /*uint streamIdUSDCVest = ISablier(LibPropConstants.SABLIER).createStream(
+        uint streamIdUSDCVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY, 
             actualAmount,
             LibPropConstants.USDC_TOKEN,
             currentTime, 
             currentTime + duration
-        );*/
+        );
         // TODO: Check streamIdUSDCVest
 
     }
