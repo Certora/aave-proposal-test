@@ -30,6 +30,13 @@ interface ICollector {
     ) external;
 }
 
+interface IPool {
+    function withdraw(
+        address asset,
+        uint256 amount,
+        address to
+    ) external returns (uint256);
+}
 
 contract PayloadCertoraProposal {
 
@@ -93,12 +100,20 @@ contract PayloadCertoraProposal {
         //IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount); // xxx
 
         /**
-            5. Transfer USDC 1,420,000 from the Aave Collector to the ShortExecutor (exact mechanism TBD).
+            5. Transfer USDC 1,420,000 from the Aave Collector to the ShortExecutor - uses new controller after proposal 61,
+            first transferring aUSDC and then withdrawing it from the pool to the executor.
          */
-        ICollector(LibPropConstants.AAVE_COLLECTOR).transfer(
-            IERC20(LibPropConstants.USDC_TOKEN),
-            LibPropConstants.SHORT_EXECUTOR,
-            LibPropConstants.USDC_V3 + LibPropConstants.USDC_VEST
+        uint totalUSDCAmount = LibPropConstants.USDC_V3 + LibPropConstants.USDC_VEST;
+        ICollector(0x7AB1e5c406F36FE20Ce7eBa528E182903CA8bFC7 /* new controller after proposal 61*/).transfer(
+            IERC20(LibPropConstants.AUSDC_TOKEN),
+            address(this),
+            totalUSDCAmount
+        );
+
+        IPool(LibPropConstants.POOL).withdraw(
+            address(LibPropConstants.USDC_TOKEN),
+            totalUSDCAmount,
+            address(this)
         );
 
         /**
