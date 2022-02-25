@@ -76,7 +76,7 @@ contract PayloadCertoraProposal {
         );
 
         /**
-            2. Approve $700,000 worth of AAVE tokens to Sablier. Future allowances should increment this to not override this vesting.
+            2. Approve $700,000 worth of AAVE tokens to Sablier.
          */
         require(IERC20(LibPropConstants.AAVE_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.AAVE_TOKEN).approve(LibPropConstants.SABLIER, vestAaveAmount);
@@ -126,7 +126,7 @@ contract PayloadCertoraProposal {
         IERC20(LibPropConstants.USDC_TOKEN).transfer(LibPropConstants.CERTORA_BENEFICIARY, LibPropConstants.USDC_V3);
 
         /**
-            7. Approve USDC 1,000,000 to Sablier. Future allowances should increment this to not override this vesting.
+            7. Approve USDC 1,000,000 to Sablier.
          */
         require(IERC20(LibPropConstants.USDC_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.USDC_TOKEN).approve(LibPropConstants.SABLIER, LibPropConstants.USDC_VEST);
