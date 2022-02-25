@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
 import {IAaveGov} from "./IAaveGov.sol";
@@ -72,12 +72,12 @@ contract PayloadCertoraProposalTest is BaseTest {
             })
         );
 
-        uint256 recipientUsdcBefore = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
+        uint256 recipientUSDCBefore = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
             LibPropConstants.CERTORA_BENEFICIARY
         );
-        uint256 recipientWethBefore = IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
-            LibPropConstants.CERTORA_BENEFICIARY
-        );
+        uint256 multisigAaveBefore = 0 /*IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_AAVE_MULTISIG
+        )*/;
 
         vm.deal(LibPropConstants.ECOSYSTEM_RESERVE, 1 ether);
         vm.startPrank(LibPropConstants.ECOSYSTEM_RESERVE);
@@ -90,10 +90,20 @@ contract PayloadCertoraProposalTest is BaseTest {
         vm.warp(executionTime + 1);
         GOV.execute(proposalId);
         vm.stopPrank();
-/*
-        _validatePhaseIFunds(recipientUsdcBefore, recipientWethBefore);
-        address newControllerOfCollector = _validateNewCollector();
-        _validateNewControllerOfCollector(ICollector(newControllerOfCollector));*/
+
+        validateFunds(recipientUSDCBefore, multisigAaveBefore);
+    }
+
+    function validateFunds(uint recipientUSDCBefore, uint multisigAaveBefore) internal view {
+        uint256 recipientUSDCAfter = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_BENEFICIARY
+        );
+        uint256 multisigAaveAfter = 0 /*IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_AAVE_MULTISIG
+        )*/;
+
+        require (recipientUSDCAfter - recipientUSDCBefore == LibPropConstants.USDC_V3, "invalid transfer of V3 services");
+        // require(multisigAaveAfter - multisigAaveBefore == (new PayloadCertoraProposal()).convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH), "invalid transfer of fund to multisig");
     }
 
     function _createProposal(IAaveGov.SPropCreateParams memory params)

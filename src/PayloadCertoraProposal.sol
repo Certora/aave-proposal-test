@@ -3,6 +3,7 @@ pragma solidity 0.8.12;
 
 import {LibPropConstants} from "./LibPropConstants.sol";
 import {IERC20} from "./IERC20.sol";
+import "./test/utils/console.sol";
 
 interface IControllerAaveEcosystemReserve {
     function transfer(
@@ -55,7 +56,7 @@ contract PayloadCertoraProposal {
     }
 
 
-    // LO: Consider using address(this) instead of SHORT_EXECUTOR
+    // LO: Consider using address(this) instead of SHORT_EXECUTOR - changed
     function execute() external {
         uint256 totalAaveAmount = convertUSDCAmountToAAVE(
                 LibPropConstants.AAVE_VEST_USDC_WORTH + LibPropConstants.AAVE_FUND_USDC_WORTH
@@ -65,16 +66,17 @@ contract PayloadCertoraProposal {
         require (totalAaveAmount - 1 <= vestAaveAmount + fundAaveAmount && vestAaveAmount + fundAaveAmount <= totalAaveAmount + 1, "not addditive");
 
         /**
-            1. Transfer a total worth of $900,000 in AAVE tokens from the EcosystemReserve to the ShortExecutor using the Ecosystem Reserve Controller contract at 0x1E506cbb6721B83B1549fa1558332381Ffa61A93.
+            1. Transfer a total worth of $900,000 in AAVE tokens from the EcosystemReserve to the 
+            ShortExecutor using the Ecosystem Reserve Controller contract at 0x1E506cbb6721B83B1549fa1558332381Ffa61A93.
         */
         IControllerAaveEcosystemReserve(LibPropConstants.ECOSYSTEM_RESERVE_CONTROLLER).transfer(
             IERC20(LibPropConstants.AAVE_TOKEN),
-            LibPropConstants.SHORT_EXECUTOR,
+            address(this),
             totalAaveAmount
         );
 
         /**
-            2. Approve $700,000 worth of AAVE tokens to Sablier.
+            2. Approve $700,000 worth of AAVE tokens to Sablier. Future allowances should increment this to not override this vesting.
          */
         require(IERC20(LibPropConstants.AAVE_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.AAVE_TOKEN).approve(LibPropConstants.SABLIER, vestAaveAmount);
@@ -85,6 +87,8 @@ contract PayloadCertoraProposal {
         uint currentTime = block.timestamp;
         uint duration = 6 * 30 days;
         uint actualAmount = (vestAaveAmount / duration) * duration; // rounding
+        console.logUint(vestAaveAmount-actualAmount);
+        //require(vestAaveAmount - actualAmount < 10, "losing more than 10 AAVE due to rounding");
         uint streamIdAaveVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY,
             actualAmount,
@@ -92,7 +96,7 @@ contract PayloadCertoraProposal {
             currentTime,
             currentTime + duration
         );
-        // TODO: Check streamIdAaveVest
+        require (streamIdAaveVest > 0, "invalid stream id");
 
         /**
             4. Transfer $200,000 worth of AAVE to a multisig co-controlled by Aave and Certora teams.
@@ -122,7 +126,7 @@ contract PayloadCertoraProposal {
         IERC20(LibPropConstants.USDC_TOKEN).transfer(LibPropConstants.CERTORA_BENEFICIARY, LibPropConstants.USDC_V3);
 
         /**
-            7. Approve USDC 1,000,000 to Sablier.
+            7. Approve USDC 1,000,000 to Sablier. Future allowances should increment this to not override this vesting.
          */
         require(IERC20(LibPropConstants.USDC_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.USDC_TOKEN).approve(LibPropConstants.SABLIER, LibPropConstants.USDC_VEST);
@@ -131,6 +135,8 @@ contract PayloadCertoraProposal {
             8. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
          */
         actualAmount = (LibPropConstants.USDC_VEST / duration) * duration; // rounding
+        console.logUint(LibPropConstants.USDC_VEST - actualAmount);
+        //require(LibPropConstants.USDC_VEST - actualAmount < 10, "losing more than 10 USDC due to rounding");
         uint streamIdUSDCVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY, 
             actualAmount,
@@ -138,7 +144,6 @@ contract PayloadCertoraProposal {
             currentTime, 
             currentTime + duration
         );
-        // TODO: Check streamIdUSDCVest
-
+        require (streamIdUSDCVest > 0, "invalid stream id");
     }
 }
