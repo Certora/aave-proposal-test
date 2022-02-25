@@ -3,7 +3,7 @@ pragma solidity 0.8.12;
 
 import {LibPropConstants} from "./LibPropConstants.sol";
 import {IERC20} from "./IERC20.sol";
-import "./test/utils/console.sol";
+//import "./test/utils/console.sol";
 
 interface IControllerAaveEcosystemReserve {
     function transfer(
@@ -87,8 +87,8 @@ contract PayloadCertoraProposal {
         uint currentTime = block.timestamp;
         uint duration = 6 * 30 days;
         uint actualAmount = (vestAaveAmount / duration) * duration; // rounding
-        console.logUint(vestAaveAmount-actualAmount);
-        //require(vestAaveAmount - actualAmount < 10, "losing more than 10 AAVE due to rounding");
+        //console.logUint(vestAaveAmount-actualAmount); // 9935957
+        require(vestAaveAmount - actualAmount < 1e18, "losing more than 1 AAVE due to rounding");
         uint streamIdAaveVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY,
             actualAmount,
@@ -135,8 +135,8 @@ contract PayloadCertoraProposal {
             8. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
          */
         actualAmount = (LibPropConstants.USDC_VEST / duration) * duration; // rounding
-        console.logUint(LibPropConstants.USDC_VEST - actualAmount);
-        //require(LibPropConstants.USDC_VEST - actualAmount < 10, "losing more than 10 USDC due to rounding");
+        //console.logUint(LibPropConstants.USDC_VEST - actualAmount); // 6400000
+        require(LibPropConstants.USDC_VEST - actualAmount < 10e6, "losing more than 10 USDC due to rounding");
         uint streamIdUSDCVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY, 
             actualAmount,
