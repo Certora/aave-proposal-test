@@ -6,10 +6,15 @@ import {IERC20} from "../IERC20.sol";
 import {BaseTest, console} from "./base/BaseTest.sol";
 import {LibPropConstants} from "../LibPropConstants.sol";
 import {PayloadCertoraProposal} from "../PayloadCertoraProposal.sol";
+import {ISablier} from "../PayloadCertoraProposal.sol";
 import "./utils/console.sol";
 
 contract PayloadCertoraProposalTest is BaseTest {
     function setUp() public {}
+
+    function aaveVestAmount(PayloadCertoraProposal proposal) internal view returns (uint256) {
+        return proposal.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH);
+    }
 
     /// @dev Check conversion of units
     function testConversion() public {
@@ -17,12 +22,12 @@ contract PayloadCertoraProposalTest is BaseTest {
         console.log(testContract.getPriceOfAAVEinUSDC());
         // price is expected to be around $130-140
         // 13,520,978,414
-        uint vestAmount = testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH)/1e18;
+        uint vestAmount = aaveVestAmount(testContract)/1e18;
         // 5000 <= vestAmount <= 5400
         assertGe(vestAmount, 5000);
         assertLe(vestAmount, 5400);
         uint fundAmount = testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH)/1e18;
-        /// 1426 <= fundAmount <= 1536
+        // 1426 <= fundAmount <= 1536
         assertGe(fundAmount, 1426);
         assertLe(fundAmount, 1536);
     }
@@ -102,6 +107,42 @@ contract PayloadCertoraProposalTest is BaseTest {
         vm.stopPrank();
 
         validateFunds(recipientUSDCBefore, multisigAaveBefore);
+        validateVesting(payload);
+    }
+
+    function validateVesting(address payload) internal {
+        uint256 usdcBefore = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_BENEFICIARY
+        );
+        uint256 aaveBefore = IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_BENEFICIARY
+        );
+        uint256 aaveToBeVested = (aaveVestAmount(PayloadCertoraProposal(payload)) / (6 * 30 days)) * (6 * 30 days);
+
+        // wrap to end of vesting
+        vm.warp(block.timestamp + 6 * 30 days + 30 days);
+
+        vm.startPrank(LibPropConstants.CERTORA_BENEFICIARY);
+        uint aaveStreamId = ISablier(LibPropConstants.SABLIER).nextStreamId() - 2;
+        uint aaveBalanceToWithdraw = ISablier(LibPropConstants.SABLIER).balanceOf(aaveStreamId, LibPropConstants.CERTORA_BENEFICIARY);
+        require (aaveBalanceToWithdraw == aaveToBeVested, "unexpected sablier balance of aave");
+        require(ISablier(LibPropConstants.SABLIER).withdrawFromStream(aaveStreamId, aaveBalanceToWithdraw), "aave withdraw failed");
+
+        uint usdcStreamId = aaveStreamId + 1;
+        uint usdcBalanceToWithdraw = ISablier(LibPropConstants.SABLIER).balanceOf(usdcStreamId, LibPropConstants.CERTORA_BENEFICIARY);
+        require (usdcBalanceToWithdraw == (LibPropConstants.USDC_VEST / (6 * 30 days)) * (6 * 30 days), "unexpected sablier balance of usdc");
+        require(ISablier(LibPropConstants.SABLIER).withdrawFromStream(usdcStreamId, usdcBalanceToWithdraw), "usdc withdraw failed");
+        vm.stopPrank();
+
+        uint256 usdcAfter = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_BENEFICIARY
+        );
+        uint256 aaveAfter = IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_BENEFICIARY
+        );
+
+        require (usdcAfter == usdcBefore + usdcBalanceToWithdraw, "not withdrawn all usdc after 6 months");
+        require (aaveAfter == aaveBefore + aaveBalanceToWithdraw, "not withdrawn all aave after 6 months");
     }
 
     function validateFunds(uint recipientUSDCBefore, uint multisigAaveBefore) internal view {

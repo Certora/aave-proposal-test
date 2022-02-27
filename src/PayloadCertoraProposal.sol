@@ -3,7 +3,6 @@ pragma solidity 0.8.12;
 
 import {LibPropConstants} from "./LibPropConstants.sol";
 import {IERC20} from "./IERC20.sol";
-//import "./test/utils/console.sol";
 
 interface IControllerAaveEcosystemReserve {
     function transfer(
@@ -21,6 +20,12 @@ interface ISablier {
         uint256 startTime, 
         uint256 stopTime
     ) external returns (uint256);
+
+    function withdrawFromStream(uint256 streamId, uint256 amount) external returns (bool);
+
+    function balanceOf(uint256 streamId, address who) external view returns (uint256);
+
+    function nextStreamId() external view returns (uint256);
 }
 
 interface ICollector {
@@ -117,7 +122,7 @@ contract PayloadCertoraProposal {
         uint currentTime = block.timestamp;
         uint duration = 6 * 30 days;
         uint actualAmount = (vestAaveAmount / duration) * duration; // rounding
-        //console.logUint(vestAaveAmount-actualAmount); // 9935957
+        //console.logUint(vestAaveAmount-actualAmount); // 15281152
         require(vestAaveAmount - actualAmount < 1e18, "losing more than 1 AAVE due to rounding");
         uint streamIdAaveVest = ISablier(LibPropConstants.SABLIER).createStream(
             LibPropConstants.CERTORA_BENEFICIARY,
