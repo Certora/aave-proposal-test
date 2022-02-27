@@ -39,19 +39,49 @@ interface IPool {
     ) external returns (uint256);
 }
 
+interface AggregatorV3Interface {
+
+  function decimals() external view returns (uint8);
+  function description() external view returns (string memory);
+  function version() external view returns (uint256);
+
+  function latestRoundData()
+    external
+    view
+    returns (
+      uint80 roundId,
+      int256 answer,
+      uint256 startedAt,
+      uint256 updatedAt,
+      uint80 answeredInRound
+    );
+
+}
+
+
 contract PayloadCertoraProposal {
 
+    function getPriceOfAAVEinUSDC() public view returns (uint256) {
+         (, int256 aavePrice, uint startedAt, , ) = AggregatorV3Interface(LibPropConstants.AAVE_USD_CHAINLINK_ORACLE).latestRoundData();
+        uint freshTime = 3 /* days */ * 24 /* hours */ * 60 /* minutes */ * 60 /* seconds */; // using "days" leads to "Expected primary expression" error
+        require (startedAt > block.timestamp - freshTime, "price is not fresh");
+        require (aavePrice > 0, "aave price must be positive");
+        return uint256(aavePrice);
+    }
 
     // formally verify me please :-)
     function convertUSDCAmountToAAVE(uint256 usdcAmount) public view returns (uint256) {
         uint8 usdcDecimals = IERC20(LibPropConstants.USDC_TOKEN).decimals();
         uint8 aaveDecimals = IERC20(LibPropConstants.AAVE_TOKEN).decimals();
 
+        uint aavePrice = getPriceOfAAVEinUSDC();
+        uint8 priceDecimals = AggregatorV3Interface(LibPropConstants.AAVE_USD_CHAINLINK_ORACLE).decimals();
+     
         /**
             aave_amount = (usdcAmount / price) * aaveDecimals / usdcDecimals
          */
-        uint256 aaveAmount = usdcAmount * 10**LibPropConstants.AAVE_PRICE_DECIMALS * 10**aaveDecimals 
-                                / (LibPropConstants.AAVE_PRICE_USDC_6_DECIMALS * 10**usdcDecimals);
+        uint256 aaveAmount = usdcAmount * 10**priceDecimals * 10**aaveDecimals 
+                                / (aavePrice * 10**usdcDecimals);
         return aaveAmount;
     }
 
@@ -108,7 +138,7 @@ contract PayloadCertoraProposal {
             first transferring aUSDC and then withdrawing it from the pool to the executor.
          */
         uint totalUSDCAmount = LibPropConstants.USDC_V3 + LibPropConstants.USDC_VEST;
-        ICollector(0x7AB1e5c406F36FE20Ce7eBa528E182903CA8bFC7 /* new controller after proposal 61*/).transfer(
+        ICollector(LibPropConstants.AAVE_COLLECTOR /* new controller after proposal 61*/).transfer(
             IERC20(LibPropConstants.AUSDC_TOKEN),
             address(this),
             totalUSDCAmount

@@ -6,6 +6,7 @@ import {IERC20} from "../IERC20.sol";
 import {BaseTest, console} from "./base/BaseTest.sol";
 import {LibPropConstants} from "../LibPropConstants.sol";
 import {PayloadCertoraProposal} from "../PayloadCertoraProposal.sol";
+import "./utils/console.sol";
 
 contract PayloadCertoraProposalTest is BaseTest {
     function setUp() public {}
@@ -13,8 +14,17 @@ contract PayloadCertoraProposalTest is BaseTest {
     /// @dev Check conversion of units
     function testConversion() public {
         PayloadCertoraProposal testContract = new PayloadCertoraProposal();
-        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH)/1e18, 4424);
-        assertEq(testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH)/1e18, 1264);
+        console.log(testContract.getPriceOfAAVEinUSDC());
+        // price is expected to be around $130-140
+        // 13,520,978,414
+        uint vestAmount = testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_VEST_USDC_WORTH)/1e18;
+        // 5000 <= vestAmount <= 5400
+        assertGe(vestAmount, 5000);
+        assertLe(vestAmount, 5400);
+        uint fundAmount = testContract.convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH)/1e18;
+        /// 1426 <= fundAmount <= 1536
+        assertGe(fundAmount, 1426);
+        assertLe(fundAmount, 1536);
     }
 
     function pass61() internal {
@@ -35,7 +45,7 @@ contract PayloadCertoraProposalTest is BaseTest {
     /// @dev First deploys a fresh payload, then tests everything using it
     function testProposalPrePayload() public {
         // imagine proposal 61 has passed
-        pass61();
+        // pass61(); // passed
         address payload = address(new PayloadCertoraProposal());
         _testProposal(payload);
     }
