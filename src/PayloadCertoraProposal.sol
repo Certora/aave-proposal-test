@@ -86,7 +86,7 @@ contract PayloadCertoraProposal {
         (uint aavePrice, uint8 priceDecimals) = getPriceOfAAVEinUSDC();
         
         /**
-            aave_amount = (usdcAmount / price) * aaveDecimals / usdcDecimals
+            aave_amount = ((usdcAmount / 10**usdcDecimals) * 10**aaveDecimals )/  (aavePrice / 10**oracleDecimals )
          */
         uint256 aaveAmount = usdcAmount * 10**priceDecimals * 10**aaveDecimals 
                                 / (aavePrice * 10**usdcDecimals);
@@ -137,9 +137,9 @@ contract PayloadCertoraProposal {
         require (streamIdAaveVest > 0, "invalid stream id");
 
         /**
-            4. Transfer $200,000 worth of AAVE to a multisig co-controlled by Aave and Certora teams.
+            4. Transfer $200,000 worth of AAVE to a multisig co-controlled by the Certora team and Aave community members.
          */
-        IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount); // xxx
+        IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount);
 
         /**
             5. Transfer USDC 1,000,000 from the Aave Collector to the ShortExecutor - uses new controller after proposal 61,
