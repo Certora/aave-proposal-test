@@ -136,13 +136,13 @@ contract PayloadCertoraProposal {
         /**
             4. Transfer $200,000 worth of AAVE to a multisig co-controlled by Aave and Certora teams.
          */
-        //IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount); // xxx
+        IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount); // xxx
 
         /**
-            5. Transfer USDC 1,420,000 from the Aave Collector to the ShortExecutor - uses new controller after proposal 61,
+            5. Transfer USDC 1,000,000 from the Aave Collector to the ShortExecutor - uses new controller after proposal 61,
             first transferring aUSDC and then withdrawing it from the pool to the executor.
          */
-        uint totalUSDCAmount = LibPropConstants.USDC_V3 + LibPropConstants.USDC_VEST;
+        uint totalUSDCAmount = LibPropConstants.USDC_VEST;
         ICollector(LibPropConstants.AAVE_COLLECTOR /* new controller after proposal 61*/).transfer(
             IERC20(LibPropConstants.AUSDC_TOKEN),
             address(this),
@@ -156,18 +156,13 @@ contract PayloadCertoraProposal {
         );
 
         /**
-            6. Transfer USDC 420,000 directly to Certora.
-         */
-        IERC20(LibPropConstants.USDC_TOKEN).transfer(LibPropConstants.CERTORA_BENEFICIARY, LibPropConstants.USDC_V3);
-
-        /**
-            7. Approve USDC 1,000,000 to Sablier.
+            6. Approve USDC 1,000,000 to Sablier.
          */
         require(IERC20(LibPropConstants.USDC_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.USDC_TOKEN).approve(LibPropConstants.SABLIER, LibPropConstants.USDC_VEST);
         
         /**
-            8. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
+            7. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
          */
         actualAmount = (LibPropConstants.USDC_VEST / duration) * duration; // rounding
         //console.logUint(LibPropConstants.USDC_VEST - actualAmount); // 6400000

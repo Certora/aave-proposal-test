@@ -106,7 +106,7 @@ contract PayloadCertoraProposalTest is BaseTest {
         GOV.execute(proposalId);
         vm.stopPrank();
 
-        validateFunds(recipientUSDCBefore, multisigAaveBefore);
+        validateFunds(multisigAaveBefore, payload);
         validateVesting(payload);
     }
 
@@ -145,16 +145,12 @@ contract PayloadCertoraProposalTest is BaseTest {
         require (aaveAfter == aaveBefore + aaveBalanceToWithdraw, "not withdrawn all aave after 6 months");
     }
 
-    function validateFunds(uint recipientUSDCBefore, uint multisigAaveBefore) internal view {
-        uint256 recipientUSDCAfter = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
-            LibPropConstants.CERTORA_BENEFICIARY
-        );
-        uint256 multisigAaveAfter = 0 /*IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
+    function validateFunds(uint multisigAaveBefore, address payload) internal view {
+        uint256 multisigAaveAfter = IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
             LibPropConstants.CERTORA_AAVE_MULTISIG
-        )*/;
+        );
 
-        require (recipientUSDCAfter - recipientUSDCBefore == LibPropConstants.USDC_V3, "invalid transfer of V3 services");
-        // require(multisigAaveAfter - multisigAaveBefore == (new PayloadCertoraProposal()).convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH), "invalid transfer of fund to multisig");
+        require(multisigAaveAfter - multisigAaveBefore == (PayloadCertoraProposal(payload)).convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH), "invalid transfer of fund to multisig");
     }
 
     function _createProposal(IAaveGov.SPropCreateParams memory params)

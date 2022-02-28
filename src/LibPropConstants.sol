@@ -15,19 +15,13 @@ library LibPropConstants {
     address internal constant SABLIER = 0xCD18eAa163733Da39c232722cBC4E8940b1D8888;
     address internal constant POOL = 0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9;
     address internal constant CERTORA_BENEFICIARY = 0x0F11640BF66e2D9352d9c41434A5C6E597c5e4c8;
-    address internal constant CERTORA_AAVE_MULTISIG = address(0x0); // xxx
+    address internal constant CERTORA_AAVE_MULTISIG = 0x5CC8438831D2DD88Cdedf0cB4Bc2D0381Ba3627E;
     address internal constant AAVE_USD_CHAINLINK_ORACLE = 0x547a514d5e3769680Ce22B2361c10Ea13619e8a9;
     // new impl
     address internal constant AAVE_COLLECTOR = 0x7AB1e5c406F36FE20Ce7eBa528E182903CA8bFC7;
     
     // Amounts
-    uint256 internal constant USDC_V3 = 420_000 * 1e6;
     uint256 internal constant USDC_VEST = 1_000_000 * 1e6;
     uint256 internal constant AAVE_VEST_USDC_WORTH = 700_000 * 1e6;
     uint256 internal constant AAVE_FUND_USDC_WORTH = 200_000 * 1e6;
-
-    /*
-    uint256 internal constant AAVE_PRICE_USDC_6_DECIMALS = 158_226364; // $158.2263636 xxx
-    uint8 internal constant AAVE_PRICE_DECIMALS = 6;
-    */
 }
