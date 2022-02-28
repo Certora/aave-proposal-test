@@ -66,12 +66,16 @@ interface AggregatorV3Interface {
 
 contract PayloadCertoraProposal {
 
-    function getPriceOfAAVEinUSDC() public view returns (uint256) {
-         (, int256 aavePrice, uint startedAt, , ) = AggregatorV3Interface(LibPropConstants.AAVE_USD_CHAINLINK_ORACLE).latestRoundData();
+    // Return the price of AAVE in USDC using the Oracle's decimals, and the decimals used
+    function getPriceOfAAVEinUSDC() public view returns (uint256,uint8) {
+        AggregatorV3Interface oracle = AggregatorV3Interface(LibPropConstants.AAVE_USD_CHAINLINK_ORACLE);
+        (, int256 aavePrice, uint startedAt, , ) = oracle.latestRoundData();
         uint freshTime = 3 /* days */ * 24 /* hours */ * 60 /* minutes */ * 60 /* seconds */; // using "days" leads to "Expected primary expression" error
         require (startedAt > block.timestamp - freshTime, "price is not fresh");
         require (aavePrice > 0, "aave price must be positive");
-        return uint256(aavePrice);
+
+        uint8 priceDecimals = oracle.decimals();
+        return (uint256(aavePrice), priceDecimals);
     }
 
     // formally verify me please :-)
@@ -79,9 +83,8 @@ contract PayloadCertoraProposal {
         uint8 usdcDecimals = IERC20(LibPropConstants.USDC_TOKEN).decimals();
         uint8 aaveDecimals = IERC20(LibPropConstants.AAVE_TOKEN).decimals();
 
-        uint aavePrice = getPriceOfAAVEinUSDC();
-        uint8 priceDecimals = AggregatorV3Interface(LibPropConstants.AAVE_USD_CHAINLINK_ORACLE).decimals();
-     
+        (uint aavePrice, uint8 priceDecimals) = getPriceOfAAVEinUSDC();
+        
         /**
             aave_amount = (usdcAmount / price) * aaveDecimals / usdcDecimals
          */

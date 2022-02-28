@@ -19,7 +19,8 @@ contract PayloadCertoraProposalTest is BaseTest {
     /// @dev Check conversion of units
     function testConversion() public {
         PayloadCertoraProposal testContract = new PayloadCertoraProposal();
-        console.log(testContract.getPriceOfAAVEinUSDC());
+        (uint price, uint8 decimals) = testContract.getPriceOfAAVEinUSDC();
+        console.log(price);
         // price is expected to be around $130-140
         // 13,520,978,414
         uint vestAmount = aaveVestAmount(testContract)/1e18;
