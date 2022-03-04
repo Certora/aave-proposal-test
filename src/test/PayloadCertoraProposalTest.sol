@@ -112,16 +112,17 @@ contract PayloadCertoraProposalTest is BaseTest {
     }
 
     function validateVesting(address payload) internal {
+        uint duration = 6 * 30 days;
         uint256 usdcBefore = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
             LibPropConstants.CERTORA_BENEFICIARY
         );
         uint256 aaveBefore = IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
             LibPropConstants.CERTORA_BENEFICIARY
         );
-        uint256 aaveToBeVested = (aaveVestAmount(PayloadCertoraProposal(payload)) / (6 * 30 days)) * (6 * 30 days);
+        uint256 aaveToBeVested = (aaveVestAmount(PayloadCertoraProposal(payload)) / duration) * duration;
 
         // wrap to end of vesting
-        vm.warp(block.timestamp + 6 * 30 days + 30 days);
+        vm.warp(block.timestamp + duration + 1 days);
 
         vm.startPrank(LibPropConstants.CERTORA_BENEFICIARY);
         uint aaveStreamId = ISablier(LibPropConstants.SABLIER).nextStreamId() - 2;
@@ -131,7 +132,9 @@ contract PayloadCertoraProposalTest is BaseTest {
 
         uint usdcStreamId = aaveStreamId + 1;
         uint usdcBalanceToWithdraw = ISablier(LibPropConstants.SABLIER).balanceOf(usdcStreamId, LibPropConstants.CERTORA_BENEFICIARY);
-        require (usdcBalanceToWithdraw == (LibPropConstants.USDC_VEST / (6 * 30 days)) * (6 * 30 days), "unexpected sablier balance of usdc");
+        uint usdcVestDuration = duration/6;
+        uint oneMonthVestedUSDCAmount = LibPropConstants.USDC_VEST/6;
+        require (usdcBalanceToWithdraw == (oneMonthVestedUSDCAmount / usdcVestDuration) * usdcVestDuration, "unexpected sablier balance of usdc");
         require(ISablier(LibPropConstants.SABLIER).withdrawFromStream(usdcStreamId, usdcBalanceToWithdraw), "usdc withdraw failed");
         vm.stopPrank();
 
