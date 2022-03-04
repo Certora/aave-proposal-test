@@ -142,7 +142,8 @@ contract PayloadCertoraProposal {
         IERC20(LibPropConstants.AAVE_TOKEN).transfer(LibPropConstants.CERTORA_AAVE_MULTISIG, fundAaveAmount);
 
         /**
-            5. Transfer USDC 1,000,000 from the Aave Collector to the ShortExecutor - uses new controller after proposal 61,
+            5. Transfer the USDC amount (1,000,000 / 6, for 1 month) from the Aave Collector to the ShortExecutor - 
+            uses new controller after proposal 61,
             first transferring aUSDC and then withdrawing it from the pool to the executor.
          */
         uint totalUSDCAmount = LibPropConstants.USDC_VEST/6; // will vest 1/6 for 1 month
@@ -159,13 +160,13 @@ contract PayloadCertoraProposal {
         );
 
         /**
-            6. Approve USDC 1,000,000 to Sablier.
+            6. Approve full USDC amount to Sablier.
          */
         require(IERC20(LibPropConstants.USDC_TOKEN).allowance(address(this), LibPropConstants.SABLIER) == 0, "Allowance to sablier is not zero");
         IERC20(LibPropConstants.USDC_TOKEN).approve(LibPropConstants.SABLIER, totalUSDCAmount);
         
         /**
-            7. Create a Sablier stream with Certora as the beneficiary, to stream the USDC 1,000,000 over 6 months.
+            7. Create a Sablier stream with Certora as the beneficiary, to stream the USDC amount over 6 months.
          */
         uint oneMonthDuration = sixMonthsDuration / 6;
         actualAmount = (totalUSDCAmount / oneMonthDuration) * oneMonthDuration; // rounding
