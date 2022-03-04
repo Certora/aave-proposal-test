@@ -132,9 +132,8 @@ contract PayloadCertoraProposalTest is BaseTest {
 
         uint usdcStreamId = aaveStreamId + 1;
         uint usdcBalanceToWithdraw = ISablier(LibPropConstants.SABLIER).balanceOf(usdcStreamId, LibPropConstants.CERTORA_BENEFICIARY);
-        uint usdcVestDuration = duration/6;
-        uint oneMonthVestedUSDCAmount = LibPropConstants.USDC_VEST/6;
-        require (usdcBalanceToWithdraw == (oneMonthVestedUSDCAmount / usdcVestDuration) * usdcVestDuration, "unexpected sablier balance of usdc");
+        uint vestedUSDCAmount = LibPropConstants.USDC_VEST;
+        require (usdcBalanceToWithdraw == (vestedUSDCAmount / duration) * duration, "unexpected sablier balance of usdc");
         require(ISablier(LibPropConstants.SABLIER).withdrawFromStream(usdcStreamId, usdcBalanceToWithdraw), "usdc withdraw failed");
         vm.stopPrank();
 
