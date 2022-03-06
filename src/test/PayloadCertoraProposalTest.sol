@@ -57,10 +57,10 @@ contract PayloadCertoraProposalTest is BaseTest {
     }
 
     /// @dev Uses an already deployed payload on the target network
-    /*function testProposalPostPayload() public {
-        address payload = address(0x0); // xxx
+    function testProposalPostPayload() public {
+        address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
         _testProposal(payload);
-    }*/
+    }
 
     IAaveGov GOV = IAaveGov(LibPropConstants.AAVE_GOVERNANCE);
 
