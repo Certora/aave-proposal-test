@@ -53,40 +53,45 @@ contract PayloadCertoraProposalTest is BaseTest {
         // imagine proposal 61 has passed
         // pass61(); // passed
         address payload = address(new PayloadCertoraProposal());
-        _testProposal(payload);
+        _testProposal(payload, 0);
     }
 
     /// @dev Uses an already deployed payload on the target network
     function testProposalPostPayload() public {
         address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
-        _testProposal(payload);
+        _testProposal(payload, 66);
     }
+
 
     IAaveGov GOV = IAaveGov(LibPropConstants.AAVE_GOVERNANCE);
 
-    function _testProposal(address payload) internal {
-        address[] memory targets = new address[](1);
-        targets[0] = payload;
-        uint256[] memory values = new uint256[](1);
-        values[0] = 0;
-        string[] memory signatures = new string[](1);
-        signatures[0] = "execute()";
-        bytes[] memory calldatas = new bytes[](1);
-        calldatas[0] = "";
-        bool[] memory withDelegatecalls = new bool[](1);
-        withDelegatecalls[0] = true;
-
-        uint256 proposalId = _createProposal(
-            IAaveGov.SPropCreateParams({
-                executor: LibPropConstants.SHORT_EXECUTOR,
-                targets: targets,
-                values: values,
-                signatures: signatures,
-                calldatas: calldatas,
-                withDelegatecalls: withDelegatecalls,
-                ipfsHash: bytes32(0)
-            })
-        );
+    function _testProposal(address payload, uint existing) internal {
+        uint256 proposalId = existing;
+        if (proposalId == 0) {
+            address[] memory targets = new address[](1);
+            targets[0] = payload;
+            uint256[] memory values = new uint256[](1);
+            values[0] = 0;
+            string[] memory signatures = new string[](1);
+            signatures[0] = "execute()";
+            bytes[] memory calldatas = new bytes[](1);
+            calldatas[0] = "";
+            bool[] memory withDelegatecalls = new bool[](1);
+            withDelegatecalls[0] = true;
+            
+            proposalId = _createProposal(
+                IAaveGov.SPropCreateParams({
+                    executor: LibPropConstants.SHORT_EXECUTOR,
+                    targets: targets,
+                    values: values,
+                    signatures: signatures,
+                    calldatas: calldatas,
+                    withDelegatecalls: withDelegatecalls,
+                    ipfsHash: bytes32(0x8f54769ae1c70e337e25314b0118ec69c439dfe701e6d0b3bb9ae28c7ae2655d)
+                }),
+                proposalId
+            );
+        }
 
         uint256 recipientUSDCBefore = IERC20(LibPropConstants.USDC_TOKEN).balanceOf(
             LibPropConstants.CERTORA_BENEFICIARY
@@ -156,21 +161,29 @@ contract PayloadCertoraProposalTest is BaseTest {
         require(multisigAaveAfter - multisigAaveBefore == (PayloadCertoraProposal(payload)).convertUSDCAmountToAAVE(LibPropConstants.AAVE_FUND_USDC_WORTH), "invalid transfer of fund to multisig");
     }
 
-    function _createProposal(IAaveGov.SPropCreateParams memory params)
+    function _createProposal(IAaveGov.SPropCreateParams memory params, uint256 proposalId)
         internal
         returns (uint256)
     {
         vm.deal(LibPropConstants.ECOSYSTEM_RESERVE, 1 ether);
         vm.startPrank(LibPropConstants.ECOSYSTEM_RESERVE);
-        uint256 proposalId = GOV.create(
-            params.executor,
-            params.targets,
-            params.values,
-            params.signatures,
-            params.calldatas,
-            params.withDelegatecalls,
-            params.ipfsHash
-        );
+        if (proposalId != 0) {
+            // we know what proposalId we expect, we check the payload itself beforehand
+            (bool success, ) = address(GOV).call{value:0}(
+                (hex'f8741a9c000000000000000000000000ee56e2b3d491590b5b31738cc34d5232f378a8d500000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000001e000000000000000000000000000000000000000000000000000000000000002408f54769ae1c70e337e25314b0118ec69c439dfe701e6d0b3bb9ae28c7ae2655d0000000000000000000000000000000000000000000000000000000000000001000000000000000000000000879a89d30b04b481bcd54f474533d3d6a27cfd7d00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000009657865637574652829000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001')
+            );
+            require(success);
+        } else {
+            proposalId = GOV.create(  
+                params.executor,
+                params.targets,
+                params.values,
+                params.signatures,
+                params.calldatas,
+                params.withDelegatecalls,
+                params.ipfsHash
+            );
+        }
         vm.stopPrank();
         return proposalId;
     }

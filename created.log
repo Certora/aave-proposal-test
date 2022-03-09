@@ -1,0 +1,26 @@
+forge create src/PayloadCertoraProposal.sol:PayloadCertoraProposal --optimize --rpc-url REDACTED --ledger
+compiling...
+Compiling 1 files with 0.5.17
+Compiling 4 files with 0.6.10
+Compilation finished successfully
+Compilation finished successfully
+Compiler run successful (with warnings)
+/Users/shelly/Certora/AaveProposal/aave-proposal-test/src/imports/interfaces/IERC20.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+
+
+/Users/shelly/Certora/AaveProposal/aave-proposal-test/src/imports/lendtoaave/IERC20.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+
+
+/Users/shelly/Certora/AaveProposal/aave-proposal-test/src/imports/lendtoaave/SafeMath.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+
+
+/Users/shelly/Certora/AaveProposal/aave-proposal-test/src/imports/aave1/Address.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+
+
+/Users/shelly/Certora/AaveProposal/aave-proposal-test/src/imports/aave1/SafeMath.sol: Warning: SPDX license identifier not provided in source file. Before publishing, consider adding a comment containing "SPDX-License-Identifier: <SPDX-License>" to each source file. Use "SPDX-License-Identifier: UNLICENSED" for non-open-source code. Please see https://spdx.org for more information.
+
+
+success.
+Deployer: 0x0f11640bf66e2d9352d9c41434a5c6e597c5e4c8
+Deployed to: 0x879a89d30b04b481bcd54f474533d3d6a27cfd7d
+Transaction hash: 0xa7697563011a359031c7d3f9bacec87e2e1486c3795458fa9baa8d45f32fbfee
