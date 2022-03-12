@@ -49,7 +49,7 @@ contract PayloadCertoraProposalTest is BaseTest {
     }
 
     /// @dev First deploys a fresh payload, then tests everything using it
-    function testProposalPrePayload() public {
+    function done_testProposalPrePayload() public {
         // imagine proposal 61 has passed
         // pass61(); // passed
         address payload = address(new PayloadCertoraProposal());
@@ -57,11 +57,58 @@ contract PayloadCertoraProposalTest is BaseTest {
     }
 
     /// @dev Uses an already deployed payload on the target network
-    function testProposalPostPayload() public {
+    function done_testProposalPostPayload() public {
         address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
         _testProposal(payload, 66);
     }
 
+    function done_testProposalQueueAndExec() public {
+        address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
+        uint proposalId = 66;
+        vm.startPrank(LibPropConstants.CERTORA_BENEFICIARY);
+        uint256 endBlock = GOV.getProposalById(proposalId).endBlock;
+        console.log(endBlock);
+        vm.roll(endBlock + 1);
+        GOV.queue(proposalId);
+        uint256 executionTime = GOV.getProposalById(proposalId).executionTime;
+        console.log(executionTime);
+        vm.warp(executionTime + 1);
+        GOV.execute(proposalId);
+        vm.stopPrank();
+        validateVesting(payload);
+    }
+
+    function done_testProposalRawQueueAndExec() public {
+        address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
+        uint proposalId = 66;
+        vm.startPrank(LibPropConstants.CERTORA_BENEFICIARY);
+        (bool success, ) = address(GOV).call{value:0}(
+            (hex'ddf0b0090000000000000000000000000000000000000000000000000000000000000042')
+        );
+        require(success);
+        uint256 executionTime = GOV.getProposalById(proposalId).executionTime;
+        console.log(executionTime);
+        vm.warp(executionTime + 1);
+        GOV.execute(proposalId);
+        vm.stopPrank();
+        validateVesting(payload);
+    }
+
+    function testProposalExec() public {
+        // assumes we're past the execution time
+        uint256 executionTime = 1647163996;
+        vm.warp(executionTime);
+        
+        address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
+        uint proposalId = 66;
+        vm.startPrank(LibPropConstants.CERTORA_BENEFICIARY);
+        (bool success, ) = address(GOV).call{value:0}(
+            (hex'fe0d94c10000000000000000000000000000000000000000000000000000000000000042')
+        );
+        require(success);
+        vm.stopPrank();
+        validateVesting(payload);
+    }
 
     IAaveGov GOV = IAaveGov(LibPropConstants.AAVE_GOVERNANCE);
 
