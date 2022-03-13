@@ -94,11 +94,11 @@ contract PayloadCertoraProposalTest is BaseTest {
         validateVesting(payload);
     }
 
-    function testProposalExec() public {
+    function done_testProposalExec() public {
         // assumes we're past the execution time
-        uint256 executionTime = 1647163996;
-        vm.warp(executionTime);
-        
+        //uint256 executionTime = 1647163996;
+        //vm.warp(executionTime);
+
         address payload = 0x879A89D30b04b481Bcd54f474533d3D6A27cFd7D;
         uint proposalId = 66;
         vm.startPrank(LibPropConstants.CERTORA_BENEFICIARY);
@@ -161,6 +161,22 @@ contract PayloadCertoraProposalTest is BaseTest {
 
         validateFunds(multisigAaveBefore, payload);
         validateVesting(payload);
+    }
+
+    function test_currentBalance() public {
+        console.log("Multisig balance in aave");
+        console.log(IERC20(LibPropConstants.AAVE_TOKEN).balanceOf(
+            LibPropConstants.CERTORA_AAVE_MULTISIG
+        ));
+
+        console.log("Sablier balance in aave");
+        uint aaveStreamId = 102894;
+        console.log(ISablier(LibPropConstants.SABLIER).balanceOf(aaveStreamId, LibPropConstants.CERTORA_BENEFICIARY));
+
+        console.log("Sablier balance in usdc");
+        uint usdcStreamId = 102895;
+        console.log(ISablier(LibPropConstants.SABLIER).balanceOf(usdcStreamId, LibPropConstants.CERTORA_BENEFICIARY));
+
     }
 
     function validateVesting(address payload) internal {
