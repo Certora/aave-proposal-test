@@ -19,7 +19,6 @@ library LibPropConstants {
     // Amounts
     uint256 internal constant USDC_VEST = 1_890_000 * 1e6;
     uint256 internal constant AAVE_VEST_USDC_WORTH = 810_000 * 1e6;
-    uint256 internal constant VEST_PERIOD_IN_MONTHS = 12;
-    // account for the time since Sep. 13 since last proposal finished vesting and this proposal, as of Nov. 8
-    uint256 internal constant DURATION = VEST_PERIOD_IN_MONTHS * 30 days - 56 days; // also lesser USDC rounding error
+    // account for the time since Sep. 13 since last proposal finished vesting and this proposal, as of Nov. 12, 2022
+    uint256 internal constant DURATION = 365 days - 60 days; // also lesser USDC rounding error
 }
