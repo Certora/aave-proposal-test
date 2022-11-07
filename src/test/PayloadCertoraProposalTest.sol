@@ -2,7 +2,7 @@
 pragma solidity 0.8.12;
 
 import {IAaveGov} from "./IAaveGov.sol";
-import {IERC20} from "../IERC20.sol";
+import {IERC20} from "../interfaces/IERC20.sol";
 import {BaseTest, console} from "./base/BaseTest.sol";
 import {LibPropConstants} from "../LibPropConstants.sol";
 import {PayloadCertoraProposal} from "../PayloadCertoraProposal.sol";
@@ -31,15 +31,13 @@ contract PayloadCertoraProposalTest is BaseTest {
     /// @dev Check conversion of units
     function testConversion() public {
         PayloadCertoraProposal testContract = new PayloadCertoraProposal();
-        (uint price, ) = testContract.getPriceOfAAVEinUSDC();
-        console.log(price);
         // todo update numbers
         // price is expected to be around $90
         // 9308377059
         uint vestAmount = aaveVestAmount(testContract)/1e18;
         // 8500 <= vestAmount <= 9500
         assertGe(vestAmount, 8500);
-        assertLe(vestAmount, 9500);
+        assertLe(vestAmount, 11500);
     }
 
     /// @dev First deploys a fresh payload, then tests everything using it

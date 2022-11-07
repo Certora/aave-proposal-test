@@ -21,4 +21,5 @@ library LibPropConstants {
     uint256 internal constant AAVE_VEST_USDC_WORTH = 810_000 * 1e6;
     // account for the time since Sep. 13 since last proposal finished vesting and this proposal, as of Nov. 12, 2022
     uint256 internal constant DURATION = 365 days - 60 days; // also lesser USDC rounding error
+    uint256 internal constant AAVE_AVG_PRICE_30D_USDC = 81340000; // calculated from the json file in the data directory
 }
