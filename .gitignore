@@ -8,3 +8,8 @@ reports/
 # Foundry
 out/
 cache/
+
+# Certora
+.certora_config/
+.certora_*
+resource_errors.json
